@@ -14,8 +14,7 @@
             WHEN score2 > score1 THEN 1
             ELSE 0
         END AS game_result
-    FROM {{ "'s3://datalake/psa/nba_elo_latest/*.parquet'" if target.name == 'parquet' 
-        else source( 'nba', 'nba_elo_latest' ) }} S
+    FROM {{ source( 'nba', 'nba_elo_latest' ) }} S
     WHERE score1 IS NOT NULL
     GROUP BY ALL
     ORDER BY S._smart_source_lineno
@@ -40,8 +39,7 @@
 {% set temp_ratings %}
     CREATE OR REPLACE TEMPORARY TABLE workings_ratings AS (
         SELECT team, elo_rating, elo_rating AS original_rating
-        FROM {{ "'s3://datalake/psa/team_ratings/*.parquet'" if target.name == 'parquet' 
-            else source('nba', 'team_ratings' ) }}
+        FROM {{ source('nba', 'team_ratings' ) }}
         GROUP BY ALL
     )
 {% endset %}
